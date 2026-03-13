@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jobly — Find Your Dream Career</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08090d;
+  --bg2:#0f1117;
+  --bg3:#151821;
+  --bg4:#1c2030;
+  --bg5:#232840;
+  --panel:#111420;
+  --border:#1f2436;
+  --border2:#2a3050;
+  --border3:#353d60;
+  --a1:#3d7fff;
+  --a2:#6b4fff;
+  --a3:#00e5b0;
+  --a4:#ff6b6b;
+  --a5:#ffb347;
+  --text:#eef0f8;
+  --t2:#8890b0;
+  --t3:#4a5270;
+  --t4:#2e3455;
+  --green:#1fd17a;
+  --red:#ff4f6d;
+  --amber:#f5a623;
+  --purple:#8b5cf6;
+  --r:10px;
+  --rc:14px;
+  --rl:18px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Cabinet Grotesk',sans-serif;font-size:14px;line-height:1.5;overflow:hidden}
+h1,h2,h3,h4,.display{font-family:'Clash Display',sans-serif;letter-spacing:-0.02em}
+button{cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:14px}
+input,textarea,select{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;outline:none}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* Layout */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:232px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:width .25s}
+.sidebar.collapsed{width:60px}
+.main{flex:1;overflow-y:auto;overflow-x:hidden}
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;background:var(--bg2);position:sticky;top:0;z-index:50}
+.content{padding:28px 28px 60px}
+
+/* Sidebar */
+.logo-area{padding:20px 16px 8px;display:flex;align-items:center;gap:10px;min-height:60px}
+.logo-mark{width:32px;height:32px;border-radius:9px;overflow:hidden;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:'Clash Display';font-size:16px;font-weight:700;background:linear-gradient(120deg,var(--a1),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.nav-section{padding:8px 10px 4px;margin-top:4px}
+.nav-label{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:0 6px;margin-bottom:4px;white-space:nowrap;overflow:hidden}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);border:none;background:transparent;color:var(--t2);width:100%;text-align:left;transition:all .15s;position:relative;white-space:nowrap;overflow:hidden}
+.nav-btn:hover{background:var(--bg4);color:var(--text)}
+.nav-btn.active{background:linear-gradient(120deg,#3d7fff18,#6b4fff18);color:var(--a1);border:1px solid #3d7fff22}
+.nav-btn .icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.nav-btn .badge{margin-left:auto;background:var(--a1);color:white;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:600}
+.sidebar-footer{margin-top:auto;padding:12px 10px 16px;border-top:1px solid var(--border)}
+.user-chip{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);cursor:pointer;transition:background .15s}
+.user-chip:hover{background:var(--bg4)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;flex-shrink:0}
+.avatar.lg{width:44px;height:44px;font-size:18px}
+.avatar.xl{width:72px;height:72px;font-size:28px;border-radius:20px}
+
+/* Cards */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rc)}
+.card-hover{transition:border-color .15s,transform .15s,box-shadow .15s;cursor:pointer}
+.card-hover:hover{border-color:var(--border3);transform:translateY(-1px);box-shadow:0 8px 32px #0006}
+
+/* Buttons */
+.btn{border:none;border-radius:var(--r);padding:8px 16px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,var(--a1),var(--a2));color:white}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:13px;border-radius:8px}
+.btn-danger{background:#ff4f6d18;color:var(--red);border:1px solid #ff4f6d33}
+.btn-success{background:#1fd17a18;color:var(--green);border:1px solid #1fd17a33}
+.btn-xs{padding:3px 9px;font-size:12px;border-radius:6px}
+
+/* Inputs */
+.inp{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:9px 13px;color:var(--text);width:100%;transition:border-color .15s}
+.inp:focus{border-color:var(--a1)}
+.inp::placeholder{color:var(--t3)}
+.inp-group{display:flex;flex-direction:column;gap:5px}
+.inp-label{font-size:12px;color:var(--t2);font-weight:500}
+.select{appearance:none;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:9px 32px 9px 13px;color:var(--text);width:100%;cursor:pointer}
+
+/* Badges */
+.badge{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.badge-blue{background:#3d7fff1a;color:#6b9fff;border:1px solid #3d7fff30}
+.badge-purple{background:#8b5cf61a;color:#a78bfa;border:1px solid #8b5cf630}
+.badge-green{background:#1fd17a1a;color:#4ade80;border:1px solid #1fd17a30}
+.badge-amber{background:#f5a6231a;color:#fbbf24;border:1px solid #f5a62330}
+.badge-red{background:#ff4f6d1a;color:#f87171;border:1px solid #ff4f6d30}
+.badge-gray{background:#1c2030;color:var(--t2);border:1px solid var(--border2)}
+
+/* Misc */
+.divider{height:1px;background:var(--border);margin:16px 0}
+.pill{border-radius:99px;padding:4px 12px;font-size:12px;background:var(--bg5);color:var(--t2);border:1px solid var(--border)}
+.tag{background:var(--bg5);color:var(--t2);border-radius:6px;padding:3px 9px;font-size:12px}
+.match-ring{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;font-family:'Clash Display';font-size:13px;font-weight:700}
+.progress-bar{height:5px;background:var(--bg5);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width .6s}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.flex{display:flex;align-items:center}
+.gap-8{gap:8px}
+.gap-12{gap:12px}
+.gap-16{gap:16px}
+.mt-4{margin-top:4px}
+.mt-8{margin-top:8px}
+.mt-12{margin-top:12px}
+.mt-16{margin-top:16px}
+.mt-20{margin-top:20px}
+.mb-4{margin-bottom:4px}
+.mb-8{margin-bottom:8px}
+.mb-12{margin-bottom:12px}
+.mb-16{margin-bottom:16px}
+.mb-20{margin-bottom:20px}
+.text-sm{font-size:13px}
+.text-xs{font-size:12px}
+.text-muted{color:var(--t2)}
+.text-hint{color:var(--t3)}
+.font-medium{font-weight:500}
+.font-bold{font-weight:700}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.section-title{font-family:'Clash Display';font-size:17px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .sub{font-family:'Cabinet Grotesk';font-size:13px;font-weight:400;color:var(--t2);margin-left:auto}
+
+/* Stat card */
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rc);padding:18px;position:relative;overflow:hidden}
+.stat-val{font-family:'Clash Display';font-size:28px;font-weight:700;line-height:1}
+.stat-label{font-size:12px;color:var(--t2);margin-top:4px}
+.stat-change{font-size:12px;margin-top:8px}
+.stat-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.06;filter:blur(20px)}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);max-height:90vh;overflow-y:auto;width:100%;max-width:620px;box-shadow:0 40px 80px #000a}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg4);border-radius:10px;padding:3px;margin-bottom:20px}
+.tab{flex:1;text-align:center;padding:7px 12px;border-radius:8px;border:none;background:transparent;color:var(--t2);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px #0005}
+
+/* AI Chat */
+.chat-bubble{padding:12px 16px;border-radius:12px;max-width:86%;line-height:1.6;font-size:14px}
+.chat-bubble.ai{background:var(--bg4);color:var(--text);border-bottom-left-radius:3px}
+.chat-bubble.user{background:linear-gradient(135deg,var(--a1),var(--a2));color:white;border-bottom-right-radius:3px;margin-left:auto}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.toggle{width:36px;height:20px;background:var(--bg5);border-radius:99px;position:relative;transition:background .2s;border:1px solid var(--border2)}
+.toggle.on{background:var(--a1);border-color:var(--a1)}
+.toggle-knob{width:14px;height:14px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s}
+.toggle.on .toggle-knob{left:18px}
+
+/* Profile strength */
+.strength-segment{height:6px;border-radius:99px;flex:1;background:var(--bg5);transition:background .3s}
+
+/* Skill bars */
+.skill-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.skill-name{width:120px;font-size:13px;color:var(--t2);flex-shrink:0}
+.skill-bar{flex:1;height:4px;background:var(--bg5);border-radius:99px;overflow:hidden}
+.skill-fill{height:100%;border-radius:99px}
+
+/* Notification dot */
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--red);position:absolute;top:8px;right:8px;border:2px solid var(--bg2)}
+
+/* Kanban */
+.kanban-col{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rc);padding:14px;min-height:300px}
+.kanban-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.kanban-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kanban-card{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.kanban-card:hover{border-color:var(--border3)}
+
+/* Interview practice */
+.practice-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rc);padding:20px}
+.difficulty-btn{padding:5px 14px;border-radius:99px;border:1px solid;font-size:12px;cursor:pointer;transition:all .15s}
+
+/* Salary tool */
+.salary-bar{height:36px;border-radius:8px;position:relative;overflow:hidden}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow{0%,100%{box-shadow:0 0 12px #3d7fff44}50%{box-shadow:0 0 24px #3d7fff88}}
+.fade-up{animation:fadeUp .3s ease both}
+.fade-in{animation:fadeIn .2s ease}
+.spinning{animation:spin 1s linear infinite}
+.pulsing{animation:pulse 1.5s ease-in-out infinite}
+.glowing{animation:glow 2s ease-in-out infinite}
+.skeleton{background:linear-gradient(90deg,var(--bg4) 25%,var(--bg5) 50%,var(--bg4) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .grid-4{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback,useMemo}=React;
+
+/* ─── DATA ─────────────────────────────────────────────────── */
+const INIT_PROFILE={
+  name:"Alex Johnson",email:"alex@email.com",location:"London, UK",
+  degree:"BSc Computer Science",university:"University of Manchester",
+  gradYear:"2024",experience:"1 year",salary:"£50k–£80k",
+  skills:["React","TypeScript","Python","Node.js","SQL","Git","Figma"],
+  jobTypes:["Remote","Hybrid"],industries:["Technology","FinTech","SaaS"],
+  bio:"Passionate CS graduate with hands-on experience in full-stack development and a keen interest in building products that users love.",
+  linkedin:"linkedin.com/in/alexjohnson",github:"github.com/alexj",
+  phone:"+44 7700 900000",profileComplete:87,
+};
+const JOBS=[
+  {id:1,title:"Frontend Engineer",company:"Stripe",location:"Remote",salary:"£85k–£110k",type:"Remote",match:96,tags:["React","TypeScript","CSS"],logo:"S",color:"#635BFF",saved:true,applied:false,featured:true,posted:"2d ago",applicants:142,desc:"Build beautiful payment UIs with React and TypeScript. Join a world-class team shaping the future of internet commerce. You'll own entire product surfaces, work closely with design, and ship features used by millions of businesses.",requirements:["3+ years React","TypeScript proficiency","Strong CSS/animation skills","Experience with payments or fintech a plus"],perks:["Remote-first","£5k learning budget","Health & dental","Equity"],culture:"High autonomy, strong eng culture, focus on craft."},
+  {id:2,title:"Graduate Software Developer",company:"Monzo",location:"London, UK",salary:"£52k–£65k",type:"Hybrid",match:91,tags:["Python","Go","Kubernetes"],logo:"M",color:"#FF5B5B",saved:false,applied:true,featured:false,posted:"1d ago",applicants:312,desc:"Join Monzo's engineering team and help build the UK's most loved digital bank. Work on features used by millions of people every day, from account management to financial insights.",requirements:["CS degree or equivalent","Python or Go","Curiosity and drive to learn","Strong fundamentals"],perks:["Hybrid working","£1k tech budget","Gym allowance","Free Monzo Plus"],culture:"Mission-driven, collaborative, fast-moving startup energy."},
+  {id:3,title:"ML Engineer",company:"DeepMind",location:"London, UK",salary:"£95k–£130k",type:"On-site",match:78,tags:["PyTorch","Python","Research"],logo:"D",color:"#4285F4",saved:false,applied:false,featured:true,posted:"3d ago",applicants:89,desc:"Research and deploy large-scale machine learning systems that push the boundaries of AI. Work alongside world-leading AI researchers to turn breakthroughs into real products.",requirements:["MSc/PhD preferred","PyTorch or JAX","Strong maths background","Publications a plus"],perks:["World-class team","£200k+ comp","Research time","Catered meals"],culture:"Rigorous, intellectually curious, long-term thinking."},
+  {id:4,title:"Product Designer",company:"Figma",location:"Remote",salary:"£75k–£95k",type:"Remote",match:85,tags:["Figma","UX","Prototyping"],logo:"F",color:"#1ABCFE",saved:false,applied:false,featured:false,posted:"5d ago",applicants:204,desc:"Design next-generation tools that empower millions of designers worldwide. Own end-to-end design for key product areas and collaborate with world-class engineers.",requirements:["5+ years product design","Strong portfolio","Figma proficiency","Systems thinking"],perks:["Remote-first","Design tools budget","Conferences","Equity"],culture:"Designer-led company, craft over velocity."},
+  {id:5,title:"Backend Engineer",company:"Revolut",location:"London, UK",salary:"£70k–£90k",type:"Hybrid",match:82,tags:["Java","Kafka","PostgreSQL"],logo:"R",color:"#00ccff",saved:true,applied:false,featured:false,posted:"1w ago",applicants:178,desc:"Scale Revolut's financial infrastructure to handle billions of transactions. Work with cutting-edge distributed systems and help us reach the next 50 million users.",requirements:["Java or Kotlin","Kafka/messaging systems","PostgreSQL","Microservices experience"],perks:["Hybrid","Medical insurance","Free Revolut Metal","Equity"],culture:"High-performance, data-driven, globally distributed."},
+  {id:6,title:"Data Scientist",company:"Spotify",location:"Stockholm / Remote",salary:"£80k–£105k",type:"Hybrid",match:74,tags:["Python","SQL","ML"],logo:"S",color:"#1DB954",saved:false,applied:false,featured:false,posted:"4d ago",applicants:267,desc:"Leverage data to improve music recommendations for 600M+ users. Partner with engineering and product teams to build models that shape what people listen to.",requirements:["PhD or MSc preferred","Strong Python & SQL","ML modelling experience","A/B testing knowledge"],perks:["Hybrid","Spotify Premium for life","Music budget","Annual hack weeks"],culture:"Creative + analytical, music-first, internationally diverse."},
+  {id:7,title:"DevOps Engineer",company:"Cloudflare",location:"Remote",salary:"£80k–£100k",type:"Remote",match:79,tags:["Kubernetes","Terraform","Go"],logo:"C",color:"#F48120",saved:false,applied:false,featured:false,posted:"6d ago",applicants:95,desc:"Help build and run one of the world's largest networks. Work on infrastructure that handles over 20% of the internet's traffic and serves billions of daily requests.",requirements:["Kubernetes & container orchestration","Terraform/IaC","Go or Rust preferred","Strong networking knowledge"],perks:["Fully remote","Top-tier pay","Global team","Mission-driven"],culture:"Engineering excellence, open source advocates, distributed by default."},
+  {id:8,title:"iOS Engineer",company:"Deliveroo",location:"London, UK",salary:"£70k–£90k",type:"Hybrid",match:68,tags:["Swift","UIKit","SwiftUI"],logo:"D",color:"#00CCBC",saved:false,applied:false,featured:false,posted:"3d ago",applicants:134,desc:"Build world-class mobile experiences for millions of hungry customers. Own key features in the consumer iOS app and collaborate across product, design, and data.",requirements:["3+ years iOS","Swift proficiency","UIKit + SwiftUI","Food-tech interest a plus"],perks:["Hybrid London","£100/mo food credit","Ride allowance","Equity"],culture:"Customer-first, fast-paced, consumer tech energy."},
+];
+const INIT_APPS=[
+  {id:1,title:"Frontend Engineer",company:"Stripe",date:"2025-03-01",status:"Interviewing",notes:"Had a great initial call with the recruiter. Technical round scheduled next week. Need to review React internals and system design.",interview:"2025-03-20",salary:"£90k",url:"stripe.com/jobs/123",contacts:[{name:"Sarah Chen",role:"Recruiter",email:"s.chen@stripe.com"}]},
+  {id:2,title:"ML Engineer",company:"OpenAI",date:"2025-02-24",status:"Applied",notes:"Submitted via careers portal. Heard back times can be 2-3 weeks.",interview:"",salary:"£110k",url:"openai.com/careers",contacts:[]},
+  {id:3,title:"Software Engineer",company:"Notion",date:"2025-02-18",status:"Rejected",notes:"Good experience with the process. Got to final round but went with a more senior candidate. Will try again in 6 months.",interview:"",salary:"£75k",url:"notion.so/jobs",contacts:[{name:"Tom Park",role:"EM",email:"t.park@notion.so"}]},
+  {id:4,title:"React Developer",company:"Vercel",date:"2025-03-05",status:"Offer",notes:"Offer received! £88k base + equity. Decision deadline: March 15th. Waiting to hear from Stripe first.",interview:"2025-03-12",salary:"£88k",url:"vercel.com/careers",contacts:[{name:"Ana Ruiz",role:"Head of Eng",email:"ana@vercel.com"}]},
+];
+const INTERVIEW_QS={
+  Behavioural:["Tell me about a time you overcame a significant technical challenge.","Describe a situation where you had to work with a difficult team member.","Give an example of a project you're most proud of and why.","Tell me about a time you made a mistake and how you handled it.","Describe how you prioritise tasks when you have multiple deadlines."],
+  Technical:["Implement a debounce function in JavaScript.","Explain the difference between == and === in JavaScript.","What is the virtual DOM and how does React use it?","Design a URL shortening service like bit.ly.","Explain time complexity of common sorting algorithms."],
+  "Company Fit":["Why do you want to work at this company specifically?","Where do you see yourself in 5 years?","What excites you most about this role?","What's your approach to learning new technologies?","How do you handle feedback and criticism?"],
+};
+const SKILLS_MARKET={React:{demand:95,avg:78,growth:"+12%"},TypeScript:{demand:89,avg:76,growth:"+18%"},Python:{demand:92,avg:80,growth:"+9%"},JavaScript:{demand:97,avg:70,growth:"+5%"},"Node.js":{demand:82,avg:72,growth:"+8%"},SQL:{demand:78,avg:68,growth:"+6%"},Docker:{demand:75,avg:75,growth:"+15%"},Kubernetes:{demand:68,avg:88,growth:"+22%"},Go:{demand:62,avg:85,growth:"+19%"},Rust:{demand:44,avg:92,growth:"+31%"}};
+
+/* ─── UTILS ─────────────────────────────────────────────────── */
+const callAI=async(prompt,onChunk)=>{
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    const text=d.content?.[0]?.text||"Unable to generate response.";
+    if(onChunk){for(let i=0;i<text.length;i+=3){await new Promise(r=>setTimeout(r,12));onChunk(text.slice(0,i+3));}onChunk(text);}
+    return text;
+  }catch(e){const msg="AI unavailable. Please check your connection.";if(onChunk)onChunk(msg);return msg;}
+};
+const matchColor=s=>s>=90?"var(--green)":s>=80?"var(--a1)":s>=70?"var(--a5)":"var(--a4)";
+const statusColor={Applied:"var(--a1)",Interviewing:"var(--a5)",Offer:"var(--green)",Rejected:"var(--red)"};
+const fmtDate=d=>d?new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):""
+const useLocalStorage=(key,init)=>{
+  const [v,sv]=useState(()=>{try{const s=localStorage.getItem(key);return s?JSON.parse(s):init;}catch{return init;}});
+  const set=useCallback(x=>{const val=typeof x==="function"?x(v):x;sv(val);try{localStorage.setItem(key,JSON.stringify(val));}catch{};},[key]);
+  return[v,set];
+};
+
+/* ─── SHARED COMPONENTS ─────────────────────────────────────── */
+const Spinner=({size=18})=><div style={{width:size,height:size,border:`2px solid var(--bg5)`,borderTopColor:"var(--a1)",borderRadius:"50%"}} className="spinning"/>;
+const Icon=({n,s=16,c})=><span style={{fontSize:s,color:c,lineHeight:1,flexShrink:0}}>{n}</span>;
+const CompLogo=({logo,color,size=40,radius=10})=>(
+  <div style={{width:size,height:size,borderRadius:radius,background:color+"18",border:`1px solid ${color}30`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"Clash Display",fontWeight:700,fontSize:size*.42,color,flexShrink:0}}>{logo}</div>
+);
+const MatchBadge=({score})=>(
+  <span className="badge" style={{background:matchColor(score)+"1a",color:matchColor(score),border:`1px solid ${matchColor(score)}33`,fontSize:11}}>{score}%</span>
+);
+const StatusBadge=({status})=>(
+  <span className="badge" style={{background:statusColor[status]+"1a",color:statusColor[status],border:`1px solid ${statusColor[status]}33`,fontSize:11}}>{status}</span>
+);
+const Toggle=({on,onChange,label})=>(
+  <div className="toggle-wrap" onClick={()=>onChange(!on)}>
+    <div className={`toggle ${on?"on":""}`}><div className="toggle-knob"/></div>
+    {label&&<span className="text-sm text-muted">{label}</span>}
+  </div>
+);
+const ProgressBar=({pct,color="var(--a1)",height=5})=>(
+  <div className="progress-bar" style={{height}}>
+    <div className="progress-fill" style={{width:`${pct}%`,background:color}}/>
+  </div>
+);
+const AIBadge=()=>(
+  <span style={{background:"linear-gradient(120deg,#3d7fff22,#6b4fff22)",color:"var(--a1)",border:"1px solid #3d7fff33",borderRadius:99,padding:"2px 9px",fontSize:11,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>
+    <span style={{fontSize:10}}>✦</span> AI
+  </span>
+);
+const EmptyState=({icon,title,sub,action,onAction})=>(
+  <div style={{textAlign:"center",padding:"60px 20px"}}>
+    <div style={{fontSize:40,marginBottom:12}}>{icon}</div>
+    <div style={{fontFamily:"Clash Display",fontSize:17,fontWeight:600,marginBottom:6}}>{title}</div>
+    <div style={{color:"var(--t2)",fontSize:14,marginBottom:action?16:0}}>{sub}</div>
+    {action&&<button className="btn btn-primary" onClick={onAction}>{action}</button>}
+  </div>
+);
+const Tooltip=({text,children})=>{
+  const [show,setShow]=useState(false);
+  return <div style={{position:"relative",display:"inline-flex"}} onMouseEnter={()=>setShow(true)} onMouseLeave={()=>setShow(false)}>
+    {children}
+    {show&&<div style={{position:"absolute",bottom:"100%",left:"50%",transform:"translateX(-50%)",background:vr("--bg5"),border:"1px solid var(--border2)",borderRadius:7,padding:"5px 9px",fontSize:12,color:"var(--text)",whiteSpace:"nowrap",marginBottom:4,zIndex:999}}>{text}</div>}
+  </div>;
+};
+const vr=v=>v; // passthrough for readability
+
+/* ─── TYPING EFFECT ─────────────────────────────────────────── */
+const Typing=({text,speed=10,done})=>{
+  const [s,setS]=useState("");
+  useEffect(()=>{setS("");let i=0;const t=setInterval(()=>{i++;setS(text.slice(0,i));if(i>=text.length){clearInterval(t);if(done)done();}},speed);return()=>clearInterval(t);},[text]);
+  return <>{s}{s.length<text.length&&<span style={{animation:"blink 1s step-end infinite"}}>▌</span>}</>;
+};
+
+/* ─── SIDEBAR ────────────────────────────────────────────────── */
+const navItems=[
+  {id:"dashboard",icon:"⊞",label:"Dashboard"},
+  {id:"search",icon:"◎",label:"Job Search",badge:3},
+  {id:"saved",icon:"♡",label:"Saved"},
+  {id:"tracker",icon:"◈",label:"Applications"},
+  {id:"cv",icon:"◧",label:"CV Builder"},
+  {id:"cover",icon:"✦",label:"Cover Letter"},
+  {id:"insights",icon:"◉",label:"Company Insights"},
+  {id:"practice",icon:"◑",label:"Interview Prep"},
+  {id:"salary",icon:"◐",label:"Salary Tool"},
+  {id:"profile",icon:"◔",label:"My Profile"},
+];
+const Sidebar=({page,setPage,apps,collapsed,setCollapsed})=>(
+  <div className={`sidebar ${collapsed?"collapsed":""}`}>
+    <div className="logo-area">
+      <div className="logo-mark" onClick={()=>setCollapsed(c=>!c)}><img src="data:image/jpeg;base64,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AUAUOQAAEBeUFFQhUQAFAAAAAAACAAoAIAAgAqgRURFQBSgiIKiqC1BViUhRABVFiL6IhUAAAUAAAKABAAUAAAE2AvoioAMqAKyADQAgigqACKAKAAAAACgAgAIlEVFRFiNKAAoCIqgAAAAKACAAoAAAIAAB6AAAAlUEAEUAaABNAEWiIAKAAAAAAAAAAAKAEBUVKiQAFAAABAAUAARQQAVQ5BEAFVYIImlEA0ACgCgQAWxFSokASiqAAAAF8hUAAAEoAEUAAAUARlKoCmgAUAAAEAUEotQABVVKCAAAAAAiUAVEipFVQBNqJVAAEQAVQBQAQAFAAAgTzQXhFSiACqAAAIAAACgAgqUBAAUF4QAX0QQFQABVAioiRagAqKAlVAFQoFAFAEQAVQAqABtQAAAABQAQAFABAAAAAVFoiACgCJABVAFABAABOVRUQAVQBQT1URABVAEABQCKiIcqgAAoAIACgCAA0ACUEVKMqIqiKCaaAAAAAAAFAAAAABABQEqoJAA2ACqAIACgBUAAAAFQBFSrwgAAKgAAG1AAD0AQVIUVagCAAoAIAKbAE2ABsAENgCwAFUAAAQAAAAAFBYgiACqAAAIAAAAABAAEABQAgAKACAAoAIACgAgcgAvogCAAoAoAIAAAAgDNIiwh6qoADQAgAEAAAAABQASAAABAVFQSABpQBQAQAAAAAAAAFICCAAEUBKtQIACgAACgAJsAEE5S1OUVrlWOTmg2lTlOQ01yerPJyDcSs8nINSnLPJyo1ycs805QaVnlOao2Mc05Q01SM8rKDQnJQUSKigCgAIAKoAgAAAAAAAAAKAEAFqIgAqgCAAAIoAAAAABEABQBQAAFRAAUAEBOFBllYiwWKAqgAAAACAAAAAAAAAqAihARKKlFAFUAAAgAtQABNoAEUABSoCAAAAoAAAoAIgCWgWs8nKWgqW8Jyii948WfVeRF5qc05OQWcrygKvKcgIvJyggvJynKWirycpyKLycgG15VkDbXocs82LKEbisxeUVRFEADagAAAAAAAgAKegAAACpFEEAAAUAKAAAAACgAgAAAAAGwCKoIpURADagCgQERlploAAUAAAUAEABQARAAUFSiAApFQEUpCggAoAIAKFARQAABQARAAABBIqeqqABsABQEohWarOShayJb4miralEogrPK8gqmONt4jfu8gYR0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ICKVAAAUWICKipQgk81TgVqCAmlAqCAKAAoAoAIAAKgCAAoAoAIAAAKIgAoAABAAFABKAAgAqgDIKFVEAFAFABmgAoAKBKCAAoAAAAAIAAACgAgAACpwIACgBsABAAUAUEvmoI9ddU97488vX+9+a+++Yj2HvfA974PA97efM97fiivP978yavzeB76r76/gU29hNX5p714M1ae+QedNX5rNX5vX+9qzVB7CavzX3vzeB74994ht5/vV968Ca0Wa0Dbzve/Nfe/N4Pvfme9+Zo28/wB6s1XgTU+bXvBXne95hNV4M1fmvvPmo86arU1Jy8Cavzamp80Hne8h348L3q+9+YPN78XvR4U1fFqavFB5kyhbPi8T3izV+YjyoV481Pm1NQV2HKak481moDoMTOL3oDQksOYCiSqAAqACKAACwoiAFEVFAAUgAigAAqCAtQUAAANoAG1AAABABFAFABQAZBUBAFiqgoJsKi0EAFAAAAAEAgRRUqpSJAAUAAAAAQAFABQAQCBAUCoyICqCoAFBQBEAFUBKJX8b775r775vXe/Wayo9j775r7/5vW+/X3wPY+++azX+b1vvvms1vmD2Pv78T33zev8AffNffQHsJrfNqa/HlXrffRfewHsprnv69d72fFfe/MHsPftTWetmr81mr8wey99F99K9dNXjx5X3vzB7H30amrPi9d77x81mqD2Pvfmvvfm9dNVr3wPYTV59WpqvXTW9eW5rX4mh7D3vzX3rwJq3jxa96K86avzamr83gzVi+9noht5/vZ8V9783gzV+bU1PmqPOmo1NR4M1PhWpqfMXbzZqfNqanxeFNT6mpqA82ajU1HhzU9FmpPig82anzXvvEmazUQeXjn8/BuZ8vDmp/C1MxXmd+L3o8WZtTPw81R5HMVw77UzIOpGJm13oDSHMAgAqpUWiIRSCKAKmwA2oAAAAAAAgAAAKACIigosKeSUAAU5KIIRUigKkVAKIoACgAAAACAAoLEORFSgACUFABIoIACgAAAigDQCoiKVAAAVUAQAAAEAFaASolfJPsy/E+zP8Z6D7L+Z9lfNpl/QTeePmv2X83reo6ulo9U3Nx0crt9PVzuWGNvhJlxcefTnw+PEynm8bLc4afexy79y8e7xZJPSW+fPr4eH4efBo2959mfNZu78XptTU9zM88rlqafvdTSws5xtu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" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:9}}/></div>
+      {!collapsed&&<div className="logo-text">Jobly</div>}
+    </div>
+    <div className="nav-section">
+      {!collapsed&&<div className="nav-label">Main</div>}
+      {navItems.slice(0,4).map(n=>(
+        <button key={n.id} className={`nav-btn ${page===n.id?"active":""}`} onClick={()=>setPage(n.id)} title={collapsed?n.label:""}>
+          <span className="icon">{n.icon}</span>
+          {!collapsed&&<><span>{n.label}</span>{n.id==="tracker"&&<span className="badge">{apps.length}</span>}{n.badge&&n.id!=="tracker"&&<span className="badge">{n.badge}</span>}</>}
+        </button>
+      ))}
+    </div>
+    <div className="nav-section">
+      {!collapsed&&<div className="nav-label">AI Tools</div>}
+      {navItems.slice(4,9).map(n=>(
+        <button key={n.id} className={`nav-btn ${page===n.id?"active":""}`} onClick={()=>setPage(n.id)} title={collapsed?n.label:""}>
+          <span className="icon">{n.icon}</span>
+          {!collapsed&&<span>{n.label}</span>}
+          {!collapsed&&<AIBadge/>}
+        </button>
+      ))}
+    </div>
+    <div className="nav-section">
+      {navItems.slice(9).map(n=>(
+        <button key={n.id} className={`nav-btn ${page===n.id?"active":""}`} onClick={()=>setPage(n.id)} title={collapsed?n.label:""}>
+          <span className="icon">{n.icon}</span>
+          {!collapsed&&<span>{n.label}</span>}
+        </button>
+      ))}
+    </div>
+    <div className="sidebar-footer">
+      <div className="user-chip">
+        <div className="avatar">A</div>
+        {!collapsed&&(
+          <div style={{minWidth:0}}>
+            <div className="text-sm font-medium truncate">Alex Johnson</div>
+            <div className="text-xs text-hint">CS Graduate · London</div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
+/* ─── JOB CARD ───────────────────────────────────────────────── */
+const JobCard=({job,onSave,onApply,onSelect,compact=false})=>(
+  <div className={`card card-hover fade-up`} style={{padding:compact?"14px":"20px"}} onClick={()=>onSelect(job)}>
+    <div className="flex gap-12">
+      <CompLogo logo={job.logo} color={job.color} size={compact?38:46}/>
+      <div style={{flex:1,minWidth:0}}>
+        <div className="flex gap-8" style={{flexWrap:"wrap",marginBottom:3}}>
+          <span style={{fontFamily:"Clash Display",fontSize:compact?14:16,fontWeight:600}}>{job.title}</span>
+          <MatchBadge score={job.match}/>
+          {job.featured&&<span className="badge badge-purple" style={{fontSize:10}}>Featured</span>}
+        </div>
+        <div className="text-sm text-muted">{job.company} · {job.location}</div>
+        {!compact&&(
+          <>
+            <div className="text-sm" style={{color:"var(--t2)",marginTop:8,lineHeight:1.6}}>{job.desc.slice(0,120)}...</div>
+            <div className="flex gap-8 mt-8" style={{flexWrap:"wrap"}}>
+              <span className="pill">{job.type}</span>
+              <span style={{color:"var(--a3)",fontSize:13,fontWeight:500}}>{job.salary}</span>
+              {job.tags.map(t=><span key={t} className="tag">{t}</span>)}
+            </div>
+            <div className="flex gap-12 mt-8" style={{color:"var(--t3)",fontSize:12}}>
+              <span>📅 {job.posted}</span>
+              <span>👥 {job.applicants} applicants</span>
+            </div>
+          </>
+        )}
+        {compact&&(
+          <div className="flex gap-8 mt-4">
+            <span className="pill" style={{fontSize:11,padding:"2px 8px"}}>{job.type}</span>
+            <span style={{color:"var(--a3)",fontSize:12}}>{job.salary}</span>
+          </div>
+        )}
+      </div>
+      <div className="flex gap-8" style={{flexShrink:0,alignSelf:"flex-start"}} onClick={e=>e.stopPropagation()}>
+        <button className="btn btn-ghost btn-sm" onClick={()=>onSave(job.id)} style={{color:job.saved?"var(--a4)":"var(--t2)"}}>
+          {job.saved?"♥":"♡"}
+        </button>
+        {!compact&&(
+          <button className={`btn btn-sm ${job.applied?"btn-ghost":"btn-primary"}`} onClick={()=>onApply(job.id)}>
+            {job.applied?"✓ Applied":"Apply"}
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
+/* ─── JOB DETAIL MODAL ───────────────────────────────────────── */
+const JobDetailModal=({job,onClose,setPage,setContextJob,jobs,setJobs})=>{
+  if(!job)return null;
+  const [tab,setTab]=useState("overview");
+  return(
+    <div className="modal-bg fade-in" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div style={{padding:"24px 24px 0"}}>
+          <div className="flex gap-16" style={{marginBottom:16}}>
+            <CompLogo logo={job.logo} color={job.color} size={56} radius={14}/>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:"Clash Display",fontSize:20,fontWeight:700}}>{job.title}</div>
+              <div className="text-muted">{job.company} · {job.location}</div>
+              <div className="flex gap-8 mt-8">
+                <MatchBadge score={job.match}/>
+                <span className="pill">{job.type}</span>
+                <span style={{color:"var(--a3)",fontWeight:500}}>{job.salary}</span>
+              </div>
+            </div>
+            <button className="btn btn-ghost btn-sm" onClick={onClose}>✕</button>
+          </div>
+          <div className="tabs">
+            {["overview","requirements","perks","culture"].map(t=>(
+              <button key={t} className={`tab ${tab===t?"active":""}`} onClick={()=>setTab(t)} style={{textTransform:"capitalize"}}>{t}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{padding:"0 24px 20px"}}>
+          {tab==="overview"&&<div>
+            <p style={{lineHeight:1.7,color:"var(--t2)",marginBottom:16}}>{job.desc}</p>
+            <div className="flex gap-8" style={{flexWrap:"wrap",marginBottom:16}}>
+              {job.tags.map(t=><span key={t} className="badge badge-blue">{t}</span>)}
+            </div>
+            <div className="flex gap-12" style={{color:"var(--t2)",fontSize:13}}>
+              <span>📅 Posted {job.posted}</span>
+              <span>👥 {job.applicants} applicants</span>
+            </div>
+          </div>}
+          {tab==="requirements"&&<ul style={{paddingLeft:18,color:"var(--t2)",lineHeight:1.9}}>
+            {job.requirements.map((r,i)=><li key={i}>{r}</li>)}
+          </ul>}
+          {tab==="perks"&&<div className="grid-2">
+            {job.perks.map((p,i)=><div key={i} className="flex gap-8" style={{background:"var(--bg4)",borderRadius:8,padding:"10px 12px"}}>
+              <span>✓</span><span style={{color:"var(--t2)",fontSize:13}}>{p}</span>
+            </div>)}
+          </div>}
+          {tab==="culture"&&<div style={{background:"var(--bg4)",borderRadius:10,padding:16,color:"var(--t2)",lineHeight:1.7}}>{job.culture}</div>}
+        </div>
+        <div className="divider" style={{margin:0}}/>
+        <div style={{padding:16,display:"flex",gap:8,flexWrap:"wrap"}}>
+          <button className="btn btn-primary" onClick={()=>{setJobs(prev=>prev.map(j=>j.id===job.id?{...j,applied:true}:j));onClose();}}>
+            {job.applied?"✓ Applied":"Apply Now"}
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={()=>{onClose();setContextJob(job);setPage("cover");}}>✦ Cover Letter</button>
+          <button className="btn btn-ghost btn-sm" onClick={()=>{onClose();setContextJob(job);setPage("insights");}}>◉ Research</button>
+          <button className="btn btn-ghost btn-sm" onClick={()=>{onClose();setContextJob(job);setPage("cv");}}>◧ Tailor CV</button>
+          <button className="btn btn-ghost btn-sm" style={{marginLeft:"auto"}} onClick={()=>{setJobs(prev=>prev.map(j=>j.id===job.id?{...j,saved:!j.saved}:j));}}>
+            {job.saved?"♥ Saved":"♡ Save"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── DASHBOARD ──────────────────────────────────────────────── */
+const Dashboard=({jobs,apps,setPage,setContextJob,profile})=>{
+  const upcoming=apps.filter(a=>a.interview&&new Date(a.interview)>=new Date());
+  const totalApps=apps.length;
+  const interviews=apps.filter(a=>["Interviewing","Offer"].includes(a.status)).length;
+  const offers=apps.filter(a=>a.status==="Offer").length;
+  const topJobs=useMemo(()=>[...jobs].sort((a,b)=>b.match-a.match).slice(0,5),[jobs]);
+  return(
+    <div>
+      {/* Hero */}
+      <div style={{marginBottom:28}}>
+        <div className="flex gap-8 mb-8" style={{color:"var(--t2)",fontSize:13}}>
+          <div style={{width:7,height:7,borderRadius:"50%",background:"var(--green)",boxShadow:"0 0 8px var(--green)",marginTop:3}}/>
+          <Typing text={`AI is analysing your profile and found ${jobs.filter(j=>j.match>=80).length} strong matches today.`}/>
+        </div>
+        <h2 style={{fontFamily:"Clash Display",fontSize:28,fontWeight:700,letterSpacing:"-.03em"}}>Good morning, {profile.name.split(" ")[0]} 👋</h2>
+        <p className="text-muted mt-4">Your job search is active. Here's your daily briefing.</p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid-4 mb-20">
+        {[
+          {label:"Applications",value:totalApps,icon:"◈",color:"var(--a1)",delta:"+2 this week"},
+          {label:"Interviews",value:interviews,icon:"◑",color:"var(--a5)",delta:"+1 scheduled"},
+          {label:"Offers",value:offers,icon:"◉",color:"var(--green)",delta:offers>0?"Active!":"Keep going"},
+          {label:"Match Rate",value:"89%",icon:"◎",color:"var(--a2)",delta:"+3% vs avg"},
+        ].map(s=>(
+          <div key={s.label} className="stat-card">
+            <div style={{position:"absolute",top:14,right:14,fontSize:20,opacity:.25}}>{s.icon}</div>
+            <div className="stat-val" style={{color:s.color}}>{s.value}</div>
+            <div className="stat-label">{s.label}</div>
+            <div className="stat-change" style={{color:s.color,opacity:.8}}>{s.delta}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid-2 mb-20">
+        {/* Top matches */}
+        <div className="card" style={{padding:20}}>
+          <div className="section-title">Top Matches <span className="sub" onClick={()=>setPage("search")} style={{cursor:"pointer",color:"var(--a1)"}}>See all →</span></div>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {topJobs.map(j=>(
+              <div key={j.id} className="flex gap-12" style={{cursor:"pointer"}} onClick={()=>{setContextJob(j);setPage("insights");}}>
+                <CompLogo logo={j.logo} color={j.color} size={34} radius={8}/>
+                <div style={{flex:1,minWidth:0}}>
+                  <div className="text-sm font-medium truncate">{j.title}</div>
+                  <div className="text-xs text-hint">{j.company} · {j.salary}</div>
+                </div>
+                <MatchBadge score={j.match}/>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pipeline */}
+        <div className="card" style={{padding:20}}>
+          <div className="section-title">Application Pipeline</div>
+          {["Applied","Interviewing","Offer","Rejected"].map(s=>{
+            const cnt=apps.filter(a=>a.status===s).length;
+            const pct=totalApps?Math.round((cnt/totalApps)*100):0;
+            return(
+              <div key={s} style={{marginBottom:12}}>
+                <div className="flex gap-8 mb-4">
+                  <span style={{width:8,height:8,borderRadius:"50%",background:statusColor[s],flexShrink:0,marginTop:4}}/>
+                  <span className="text-sm" style={{flex:1}}>{s}</span>
+                  <span className="text-xs text-muted">{cnt} ({pct}%)</span>
+                </div>
+                <ProgressBar pct={pct} color={statusColor[s]}/>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Upcoming interviews */}
+      {upcoming.length>0&&(
+        <div style={{background:"linear-gradient(135deg,#3d7fff10,#6b4fff10)",border:"1px solid #3d7fff22",borderRadius:14,padding:20,marginBottom:20}}>
+          <div className="section-title">📅 Upcoming Interviews</div>
+          {upcoming.map(a=>(
+            <div key={a.id} className="flex gap-12" style={{marginBottom:12}}>
+              <div style={{flex:1}}>
+                <div className="font-medium">{a.title} at {a.company}</div>
+                <div className="text-sm text-muted">{fmtDate(a.interview)} · {a.notes.slice(0,60)}...</div>
+              </div>
+              <button className="btn btn-sm btn-ghost" onClick={()=>{setContextJob(jobs.find(j=>j.company===a.company)||jobs[0]);setPage("practice");}}>Prep with AI ✦</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* AI Suggestions */}
+      <div className="card" style={{padding:20}}>
+        <div className="section-title"><AIBadge/> AI Suggestions to Improve Your Search</div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {[
+            {icon:"◧",text:"Your CV hasn't been updated in 14 days — consider tailoring it for your top 3 matches.",action:"Update CV",page:"cv"},
+            {icon:"✦",text:`You've applied to ${totalApps} jobs but only ${Math.floor(totalApps*.3)} have cover letters. Add one to boost response rate.`,action:"Write Letter",page:"cover"},
+            {icon:"◑",text:"Stripe interview in 7 days — practice common system design questions now.",action:"Start Practice",page:"practice"},
+          ].map((s,i)=>(
+            <div key={i} className="flex gap-12" style={{background:"var(--bg4)",borderRadius:10,padding:"12px 14px"}}>
+              <span style={{fontSize:18,flexShrink:0}}>{s.icon}</span>
+              <span className="text-sm" style={{flex:1,color:"var(--t2)",lineHeight:1.6}}>{s.text}</span>
+              <button className="btn btn-ghost btn-xs" onClick={()=>setPage(s.page)}>{s.action}</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── JOB SEARCH ─────────────────────────────────────────────── */
+const JobSearch=({jobs,setJobs,onSelect})=>{
+  const [q,setQ]=useState("");
+  const [type,setType]=useState("All");
+  const [sort,setSort]=useState("match");
+  const [minMatch,setMinMatch]=useState(0);
+  const [showFilters,setShowFilters]=useState(false);
+  const filtered=useMemo(()=>{
+    let r=jobs.filter(j=>{
+      const sq=q.toLowerCase();
+      return(!sq||j.title.toLowerCase().includes(sq)||j.company.toLowerCase().includes(sq)||j.tags.some(t=>t.toLowerCase().includes(sq)))
+        &&(type==="All"||j.type===type)&&j.match>=minMatch;
+    });
+    if(sort==="match")r.sort((a,b)=>b.match-a.match);
+    else if(sort==="recent")r.sort((a,b)=>a.id-b.id);
+    return r;
+  },[jobs,q,type,sort,minMatch]);
+  return(
+    <div>
+      <div className="flex gap-12 mb-16" style={{flexWrap:"wrap"}}>
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700,flex:1}}>Job Search</h2>
+        <span className="text-sm text-muted" style={{alignSelf:"center"}}>{filtered.length} results</span>
+      </div>
+
+      {/* Search bar */}
+      <div style={{background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:12,padding:14,marginBottom:12}}>
+        <div className="flex gap-10" style={{marginBottom:showFilters?12:0}}>
+          <div style={{flex:1,position:"relative"}}>
+            <span style={{position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",color:"var(--t3)"}}>◎</span>
+            <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search roles, companies, skills…" className="inp" style={{paddingLeft:34}}/>
+          </div>
+          <select value={type} onChange={e=>setType(e.target.value)} className="inp" style={{width:130}}>
+            {["All","Remote","Hybrid","On-site"].map(t=><option key={t}>{t}</option>)}
+          </select>
+          <button className={`btn btn-ghost btn-sm`} onClick={()=>setShowFilters(v=>!v)}>⚙ Filters</button>
+        </div>
+        {showFilters&&(
+          <div className="flex gap-16" style={{flexWrap:"wrap"}}>
+            <div className="inp-group" style={{flex:1}}>
+              <label className="inp-label">Min Match Score: {minMatch}%</label>
+              <input type="range" min={0} max={95} step={5} value={minMatch} onChange={e=>setMinMatch(+e.target.value)} style={{width:"100%",accentColor:"var(--a1)"}}/>
+            </div>
+            <div className="inp-group" style={{flex:1}}>
+              <label className="inp-label">Sort By</label>
+              <select value={sort} onChange={e=>setSort(e.target.value)} className="select">
+                <option value="match">AI Match Score</option>
+                <option value="recent">Most Recent</option>
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {filtered.length===0&&<EmptyState icon="◎" title="No jobs found" sub="Try adjusting your filters or search term"/>}
+        {filtered.map(j=>(
+          <JobCard key={j.id} job={j} onSelect={onSelect}
+            onSave={id=>setJobs(p=>p.map(j=>j.id===id?{...j,saved:!j.saved}:j))}
+            onApply={id=>setJobs(p=>p.map(j=>j.id===id?{...j,applied:!j.applied}:j))}/>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ─── SAVED JOBS ─────────────────────────────────────────────── */
+const SavedJobs=({jobs,setJobs,onSelect})=>{
+  const saved=jobs.filter(j=>j.saved);
+  return(
+    <div>
+      <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700,marginBottom:16}}>Saved Jobs ({saved.length})</h2>
+      {saved.length===0?<EmptyState icon="♡" title="No saved jobs yet" sub="Heart a job in the search to save it here"/>:
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {saved.map(j=><JobCard key={j.id} job={j} onSelect={onSelect}
+            onSave={id=>setJobs(p=>p.map(j=>j.id===id?{...j,saved:false}:j))}
+            onApply={id=>setJobs(p=>p.map(j=>j.id===id?{...j,applied:!j.applied}:j))}/>)}
+        </div>}
+    </div>
+  );
+};
+
+/* ─── APP TRACKER ────────────────────────────────────────────── */
+const AppTracker=({apps,setApps})=>{
+  const [view,setView]=useState("kanban");
+  const [modal,setModal]=useState(null);
+  const [adding,setAdding]=useState(false);
+  const [form,setForm]=useState({title:"",company:"",status:"Applied",notes:"",interview:"",salary:"",url:""});
+  const cols=["Applied","Interviewing","Offer","Rejected"];
+  const addApp=()=>{
+    if(!form.title||!form.company)return;
+    setApps(p=>[...p,{...form,id:Date.now(),date:new Date().toISOString().slice(0,10),contacts:[]}]);
+    setForm({title:"",company:"",status:"Applied",notes:"",interview:"",salary:"",url:""});
+    setAdding(false);
+  };
+  const totalApps=apps.length;
+  const successRate=totalApps?Math.round((apps.filter(a=>a.status==="Offer").length/totalApps)*100):0;
+  return(
+    <div>
+      <div className="flex gap-12 mb-16" style={{flexWrap:"wrap"}}>
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700,flex:1}}>Application Tracker</h2>
+        <div className="tabs" style={{margin:0,width:"auto",flex:"none"}}>
+          <button className={`tab ${view==="kanban"?"active":""}`} onClick={()=>setView("kanban")}>Kanban</button>
+          <button className={`tab ${view==="list"?"active":""}`} onClick={()=>setView("list")}>List</button>
+        </div>
+        <button className="btn btn-primary btn-sm" onClick={()=>setAdding(true)}>+ Add</button>
+      </div>
+
+      {/* Mini stats */}
+      <div className="grid-4 mb-20">
+        {[
+          {l:"Total",v:totalApps,c:"var(--a1)"},
+          {l:"Active",v:apps.filter(a=>["Applied","Interviewing"].includes(a.status)).length,c:"var(--a5)"},
+          {l:"Offers",v:apps.filter(a=>a.status==="Offer").length,c:"var(--green)"},
+          {l:"Success Rate",v:`${successRate}%`,c:"var(--purple)"},
+        ].map(s=><div key={s.l} style={{background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:10,padding:14}}>
+          <div style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700,color:s.c}}>{s.v}</div>
+          <div className="text-xs text-hint">{s.l}</div>
+        </div>)}
+      </div>
+
+      {adding&&(
+        <div className="card" style={{padding:20,marginBottom:16}}>
+          <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:14}}>New Application</div>
+          <div className="grid-2" style={{marginBottom:10}}>
+            <div className="inp-group"><label className="inp-label">Job Title *</label><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} className="inp" placeholder="Frontend Engineer"/></div>
+            <div className="inp-group"><label className="inp-label">Company *</label><input value={form.company} onChange={e=>setForm(p=>({...p,company:e.target.value}))} className="inp" placeholder="Stripe"/></div>
+          </div>
+          <div className="grid-2" style={{marginBottom:10}}>
+            <div className="inp-group"><label className="inp-label">Status</label>
+              <select value={form.status} onChange={e=>setForm(p=>({...p,status:e.target.value}))} className="inp">
+                {cols.map(c=><option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="inp-group"><label className="inp-label">Salary</label><input value={form.salary} onChange={e=>setForm(p=>({...p,salary:e.target.value}))} className="inp" placeholder="£70k"/></div>
+          </div>
+          <div className="grid-2" style={{marginBottom:10}}>
+            <div className="inp-group"><label className="inp-label">Interview Date</label><input type="date" value={form.interview} onChange={e=>setForm(p=>({...p,interview:e.target.value}))} className="inp"/></div>
+            <div className="inp-group"><label className="inp-label">Job URL</label><input value={form.url} onChange={e=>setForm(p=>({...p,url:e.target.value}))} className="inp" placeholder="https://…"/></div>
+          </div>
+          <div className="inp-group" style={{marginBottom:12}}>
+            <label className="inp-label">Notes</label>
+            <textarea value={form.notes} onChange={e=>setForm(p=>({...p,notes:e.target.value}))} className="inp" style={{height:70,resize:"none"}} placeholder="Any notes about this application…"/>
+          </div>
+          <div className="flex gap-8">
+            <button className="btn btn-primary btn-sm" onClick={addApp}>Save Application</button>
+            <button className="btn btn-ghost btn-sm" onClick={()=>setAdding(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {view==="kanban"&&(
+        <div className="grid-4">
+          {cols.map(col=>{
+            const colApps=apps.filter(a=>a.status===col);
+            return(
+              <div key={col} className="kanban-col">
+                <div className="kanban-header">
+                  <div className="kanban-dot" style={{background:statusColor[col]}}/>
+                  <span className="font-medium text-sm">{col}</span>
+                  <span className="text-xs text-hint" style={{marginLeft:"auto"}}>{colApps.length}</span>
+                </div>
+                {colApps.length===0&&<div className="text-xs text-hint" style={{textAlign:"center",padding:"20px 0"}}>No applications</div>}
+                {colApps.map(a=>(
+                  <div key={a.id} className="kanban-card" onClick={()=>setModal(a)}>
+                    <div className="text-sm font-medium">{a.title}</div>
+                    <div className="text-xs text-hint mt-4">{a.company}</div>
+                    {a.salary&&<div className="text-xs" style={{color:"var(--a3)",marginTop:4}}>{a.salary}</div>}
+                    {a.interview&&<div className="text-xs" style={{color:"var(--a5)",marginTop:4}}>📅 {fmtDate(a.interview)}</div>}
+                    <div className="text-xs text-hint" style={{marginTop:6}}>Applied {fmtDate(a.date)}</div>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {view==="list"&&(
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {apps.map(a=>(
+            <div key={a.id} className="card" style={{padding:"14px 16px",cursor:"pointer"}} onClick={()=>setModal(a)}>
+              <div className="flex gap-12">
+                <div style={{flex:1}}>
+                  <div className="flex gap-8">
+                    <span className="font-medium">{a.title}</span>
+                    <span className="text-muted">at</span>
+                    <span className="font-medium">{a.company}</span>
+                    {a.salary&&<span style={{color:"var(--a3)",fontSize:13}}>{a.salary}</span>}
+                  </div>
+                  {a.notes&&<div className="text-xs text-hint mt-4" style={{maxWidth:400}}>{a.notes.slice(0,80)}…</div>}
+                </div>
+                <div className="flex gap-8">
+                  {a.interview&&<span className="text-xs" style={{color:"var(--a5)"}}>📅 {fmtDate(a.interview)}</span>}
+                  <StatusBadge status={a.status}/>
+                  <span className="text-xs text-hint">{fmtDate(a.date)}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {modal&&(
+        <div className="modal-bg fade-in" onClick={()=>setModal(null)}>
+          <div className="modal" style={{maxWidth:520}} onClick={e=>e.stopPropagation()}>
+            <div style={{padding:24}}>
+              <div className="flex gap-12 mb-16">
+                <div>
+                  <div style={{fontFamily:"Clash Display",fontSize:18,fontWeight:700}}>{modal.title}</div>
+                  <div className="text-muted">{modal.company}</div>
+                </div>
+                <button className="btn btn-ghost btn-sm" style={{marginLeft:"auto"}} onClick={()=>setModal(null)}>✕</button>
+              </div>
+              <div className="grid-2 mb-12">
+                <div><div className="inp-label mb-4">Status</div>
+                  <select value={modal.status} onChange={e=>{const s=e.target.value;setApps(p=>p.map(a=>a.id===modal.id?{...a,status:s}:a));setModal(m=>({...m,status:s}));}} className="inp">
+                    {cols.map(c=><option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div><div className="inp-label mb-4">Interview Date</div>
+                  <input type="date" value={modal.interview||""} onChange={e=>{const v=e.target.value;setApps(p=>p.map(a=>a.id===modal.id?{...a,interview:v}:a));setModal(m=>({...m,interview:v}));}} className="inp"/>
+                </div>
+              </div>
+              <div className="inp-group mb-12">
+                <label className="inp-label">Notes</label>
+                <textarea value={modal.notes} onChange={e=>{const v=e.target.value;setApps(p=>p.map(a=>a.id===modal.id?{...a,notes:v}:a));setModal(m=>({...m,notes:v}));}} className="inp" style={{height:90,resize:"none"}}/>
+              </div>
+              {modal.contacts?.length>0&&(
+                <div>
+                  <div className="inp-label mb-8">Contacts</div>
+                  {modal.contacts.map((c,i)=>(
+                    <div key={i} className="flex gap-10" style={{background:"var(--bg4)",borderRadius:8,padding:"10px 12px",marginBottom:6}}>
+                      <div className="avatar" style={{width:28,height:28,fontSize:11}}>{c.name[0]}</div>
+                      <div>
+                        <div className="text-sm font-medium">{c.name}</div>
+                        <div className="text-xs text-hint">{c.role} · {c.email}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-8 mt-16">
+                <button className="btn btn-danger btn-sm" onClick={()=>{setApps(p=>p.filter(a=>a.id!==modal.id));setModal(null);}}>Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── CV BUILDER ─────────────────────────────────────────────── */
+const CVBuilder=({contextJob,profile})=>{
+  const [tone,setTone]=useState("Professional");
+  const [focus,setFocus]=useState("technical");
+  const [loading,setLoading]=useState(false);
+  const [cv,setCv]=useState("");
+  const [editing,setEditing]=useState(false);
+  const generate=async()=>{
+    setLoading(true);setCv("");
+    const jobInfo=contextJob?`for the role of ${contextJob.title} at ${contextJob.company}. Required skills: ${contextJob.tags?.join(", ")}. Job description: ${contextJob.desc}`:"for a general frontend / software engineering role";
+    const prompt=`Generate a tailored, ${tone.toLowerCase()} CV ${jobInfo}. 
+
+Candidate profile:
+- Name: ${profile.name}
+- Degree: ${profile.degree} from ${profile.university} (${profile.gradYear})
+- Skills: ${profile.skills.join(", ")}
+- Experience: ${profile.experience}
+- Bio: ${profile.bio}
+
+Format the CV clearly with these sections:
+1. PROFESSIONAL SUMMARY (3 sentences, ${tone.toLowerCase()} tone)
+2. TECHNICAL SKILLS (organised by category, highlight skills matching the job)
+3. EDUCATION
+4. EXPERIENCE (2-3 bullet points per role, with measurable impact)
+5. PROJECTS (2-3 relevant projects with tech stack)
+6. ADDITIONAL
+
+Use --- as section dividers. Keep bullet points punchy and impact-focused. ${focus==="technical"?"Emphasise technical depth and engineering achievements.":"Emphasise collaboration, communication, and business impact."}`;
+    await callAI(prompt,setCv);
+    setLoading(false);
+  };
+  return(
+    <div>
+      <div className="flex gap-12 mb-4">
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700}}>AI CV Builder</h2>
+        <AIBadge/>
+      </div>
+      <p className="text-muted mb-20">Generate a tailored CV optimised with AI for any role.</p>
+
+      {contextJob&&(
+        <div style={{background:"linear-gradient(135deg,#3d7fff12,#6b4fff12)",border:"1px solid #3d7fff25",borderRadius:12,padding:"12px 16px",marginBottom:16}} className="flex gap-12">
+          <CompLogo logo={contextJob.logo} color={contextJob.color} size={36} radius={8}/>
+          <div>
+            <div className="text-sm font-medium">Tailoring for: {contextJob.title} at {contextJob.company}</div>
+            <div className="text-xs text-muted">CV will be optimised for this specific role</div>
+          </div>
+        </div>
+      )}
+
+      <div className="card" style={{padding:20,marginBottom:16}}>
+        <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:14}}>Generation Settings</div>
+        <div className="grid-2 mb-16">
+          <div className="inp-group">
+            <label className="inp-label">Tone</label>
+            <div className="flex gap-8" style={{flexWrap:"wrap",marginTop:4}}>
+              {["Professional","Confident","Technical","Concise"].map(t=>(
+                <button key={t} onClick={()=>setTone(t)} className="btn btn-xs" style={{background:tone===t?"var(--a1)":"var(--bg5)",color:tone===t?"white":"var(--t2)",border:tone===t?"1px solid var(--a1)":"1px solid var(--border)",borderRadius:99}}>{t}</button>
+              ))}
+            </div>
+          </div>
+          <div className="inp-group">
+            <label className="inp-label">Focus</label>
+            <div className="flex gap-8" style={{flexWrap:"wrap",marginTop:4}}>
+              {[{v:"technical",l:"Technical Depth"},{v:"impact",l:"Business Impact"}].map(f=>(
+                <button key={f.v} onClick={()=>setFocus(f.v)} className="btn btn-xs" style={{background:focus===f.v?"var(--a2)":"var(--bg5)",color:focus===f.v?"white":"var(--t2)",border:focus===f.v?"1px solid var(--a2)":"1px solid var(--border)",borderRadius:99}}>{f.l}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <button onClick={generate} disabled={loading} className="btn btn-primary" style={{width:"100%",justifyContent:"center",opacity:loading?.7:1}}>
+          {loading?<><Spinner size={15}/> Generating your CV…</>:<>✦ Generate CV with AI</>}
+        </button>
+      </div>
+
+      {cv&&(
+        <div className="card" style={{padding:20}}>
+          <div className="flex gap-10 mb-16">
+            <span style={{fontFamily:"Clash Display",fontWeight:600,flex:1}}>Generated CV</span>
+            <button className="btn btn-ghost btn-sm" onClick={()=>setEditing(e=>!e)}>{editing?"Preview":"Edit"}</button>
+            <button className="btn btn-ghost btn-sm" onClick={generate}>↻ Regenerate</button>
+            <button className="btn btn-primary btn-sm">⬇ Export PDF</button>
+          </div>
+          {editing?
+            <textarea value={cv} onChange={e=>setCv(e.target.value)} className="inp" style={{height:500,resize:"vertical",fontFamily:"Cabinet Grotesk",fontSize:13,lineHeight:1.7}}/>:
+            <pre style={{whiteSpace:"pre-wrap",fontSize:13,lineHeight:1.8,color:"var(--t2)",background:"var(--bg4)",borderRadius:10,padding:18,fontFamily:"Cabinet Grotesk"}}>{cv}</pre>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── COVER LETTER ───────────────────────────────────────────── */
+const CoverLetter=({contextJob,profile})=>{
+  const [tone,setTone]=useState("Professional");
+  const [loading,setLoading]=useState(false);
+  const [letter,setLetter]=useState("");
+  const [editing,setEditing]=useState(false);
+  const job=contextJob||{title:"Software Engineer",company:"a leading tech company",desc:"Building great products.",tags:[]};
+  const generate=async()=>{
+    setLoading(true);setLetter("");
+    const prompt=`Write a ${tone.toLowerCase()} cover letter for a ${job.title} role at ${job.company}.
+
+Job description: "${job.desc}"
+${job.tags?.length?`Required skills: ${job.tags.join(", ")}`:""}
+
+Candidate profile:
+- Name: ${profile.name}
+- Education: ${profile.degree} from ${profile.university}
+- Skills: ${profile.skills.join(", ")}
+- Experience: ${profile.experience}
+- Bio: ${profile.bio}
+
+Write 4 focused paragraphs:
+1. Opening: strong hook, specific reason for interest in ${job.company}
+2. Why them: what you know/admire about the company and role
+3. Why you: your most relevant experience and 1-2 concrete achievements
+4. Closing: call to action, enthusiasm
+
+Tone: ${tone}. Be specific, not generic. Avoid clichés. Start with "Dear Hiring Team at ${job.company},"`;
+    await callAI(prompt,setLetter);
+    setLoading(false);
+  };
+  return(
+    <div>
+      <div className="flex gap-12 mb-4">
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700}}>Cover Letter Generator</h2>
+        <AIBadge/>
+      </div>
+      <p className="text-muted mb-20">AI writes a personalised cover letter tailored to each role.</p>
+
+      <div style={{background:"linear-gradient(135deg,#3d7fff12,#00e5b010)",border:"1px solid #3d7fff25",borderRadius:12,padding:"14px 16px",marginBottom:16}} className="flex gap-12">
+        <CompLogo logo={job.title?.[0]||"J"} color={contextJob?.color||"var(--a1)"} size={38} radius={8}/>
+        <div style={{flex:1}}>
+          <div className="font-medium">{job.title} at {job.company}</div>
+          <div className="text-xs text-muted">{contextJob?"Tailored for this specific role":"Select a job from Job Search to tailor this letter"}</div>
+        </div>
+      </div>
+
+      <div className="card" style={{padding:20,marginBottom:16}}>
+        <div className="inp-group mb-16">
+          <label className="inp-label">Tone</label>
+          <div className="flex gap-8 mt-4" style={{flexWrap:"wrap"}}>
+            {["Professional","Confident","Friendly","Concise","Enthusiastic"].map(t=>(
+              <button key={t} onClick={()=>setTone(t)} className="btn btn-xs" style={{background:tone===t?"var(--a1)":"var(--bg5)",color:tone===t?"white":"var(--t2)",border:tone===t?"1px solid var(--a1)":"1px solid var(--border)",borderRadius:99}}>{t}</button>
+            ))}
+          </div>
+        </div>
+        <button onClick={generate} disabled={loading} className="btn btn-primary" style={{width:"100%",justifyContent:"center",opacity:loading?.7:1}}>
+          {loading?<><Spinner size={15}/> Writing your letter…</>:<>✦ Generate Cover Letter</>}
+        </button>
+      </div>
+
+      {letter&&(
+        <div className="card" style={{padding:20}}>
+          <div className="flex gap-10 mb-16">
+            <span style={{fontFamily:"Clash Display",fontWeight:600,flex:1}}>Your Cover Letter</span>
+            <button className="btn btn-ghost btn-sm" onClick={()=>setEditing(e=>!e)}>{editing?"Preview":"Edit"}</button>
+            <button className="btn btn-ghost btn-sm" onClick={generate}>↻ Regenerate</button>
+            <button className="btn btn-primary btn-sm">⬇ Download</button>
+          </div>
+          {editing?
+            <textarea value={letter} onChange={e=>setLetter(e.target.value)} className="inp" style={{height:380,resize:"vertical",fontSize:14,lineHeight:1.8}}/>:
+            <div style={{whiteSpace:"pre-wrap",fontSize:14,lineHeight:1.9,color:"var(--t2)",background:"var(--bg4)",borderRadius:10,padding:20}}>{letter}</div>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── COMPANY INSIGHTS ───────────────────────────────────────── */
+const CompanyInsights=({contextJob,jobs,setContextJob})=>{
+  const [loading,setLoading]=useState(false);
+  const [insights,setInsights]=useState("");
+  const [searched,setSearched]=useState(false);
+  const job=contextJob||null;
+  const research=async(j)=>{
+    if(!j)return;
+    setContextJob(j);setLoading(true);setInsights("");setSearched(true);
+    const prompt=`Provide a comprehensive company research brief for ${j.company} to help a job applicant prepare.
+
+Format with clear sections:
+## Company Overview
+## Products & Services
+## Company Culture & Values
+## Recent Developments (2024-2025)
+## Key Competitors
+## Why Work Here
+## Interview Tips for ${j.company}
+
+Be specific and actionable. Base on what is publicly known about ${j.company}.`;
+    await callAI(prompt,setInsights);
+    setLoading(false);
+  };
+  const formatInsights=(text)=>text.split("\n").map((line,i)=>{
+    if(line.startsWith("## "))return <div key={i} style={{fontFamily:"Clash Display",fontWeight:600,fontSize:15,marginTop:i>0?20:0,marginBottom:8,color:"var(--text)"}}>{line.replace("## ","")}</div>;
+    if(line.startsWith("- "))return <div key={i} className="flex gap-8 mb-4"><span style={{color:"var(--a1)",flexShrink:0}}>·</span><span style={{color:"var(--t2)",fontSize:13,lineHeight:1.6}}>{line.slice(2)}</span></div>;
+    if(line.trim()==="")return <div key={i} style={{height:4}}/>;
+    return <div key={i} style={{color:"var(--t2)",fontSize:13,lineHeight:1.7,marginBottom:4}}>{line}</div>;
+  });
+  return(
+    <div>
+      <div className="flex gap-12 mb-4">
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700}}>Company Insights</h2>
+        <AIBadge/>
+      </div>
+      <p className="text-muted mb-20">AI-powered company research to prepare for applications and interviews.</p>
+
+      {!searched&&(
+        <div>
+          <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:12}}>Select a company to research</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {jobs.map(j=>(
+              <div key={j.id} className="card card-hover flex gap-12" style={{padding:"14px 16px"}} onClick={()=>research(j)}>
+                <CompLogo logo={j.logo} color={j.color} size={38} radius={8}/>
+                <div style={{flex:1}}>
+                  <div className="font-medium">{j.company}</div>
+                  <div className="text-xs text-muted">{j.location} · {j.type}</div>
+                </div>
+                <div className="flex gap-8">
+                  <MatchBadge score={j.match}/>
+                  <span className="text-sm" style={{color:"var(--a1)"}}>Research →</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {searched&&(
+        <>
+          {job&&(
+            <div className="flex gap-12 mb-16">
+              <CompLogo logo={job.logo} color={job.color} size={44} radius={12}/>
+              <div style={{flex:1}}>
+                <div style={{fontFamily:"Clash Display",fontSize:18,fontWeight:700}}>{job.company}</div>
+                <div className="text-muted">{job.title} · {job.location}</div>
+              </div>
+              <button className="btn btn-ghost btn-sm" onClick={()=>{setSearched(false);setInsights("");}}>← Back</button>
+              <button className="btn btn-ghost btn-sm" onClick={()=>research(job)}>↻ Refresh</button>
+            </div>
+          )}
+          <div className="card" style={{padding:20}}>
+            {loading?<div style={{textAlign:"center",padding:60}}>
+              <div style={{fontSize:28,marginBottom:12}} className="pulsing">◉</div>
+              <div className="text-muted">Researching {job?.company}…</div>
+            </div>:
+            <div>{formatInsights(insights)}</div>}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+/* ─── INTERVIEW PRACTICE ─────────────────────────────────────── */
+const InterviewPractice=({contextJob})=>{
+  const [cat,setCat]=useState("Behavioural");
+  const [qIdx,setQIdx]=useState(0);
+  const [answer,setAnswer]=useState("");
+  const [feedback,setFeedback]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [chatHistory,setChatHistory]=useState([
+    {role:"ai",text:"Hi! I'm your AI interview coach. Choose a question category, write your answer, and I'll give you detailed feedback. Let's ace that interview! 🎯"}
+  ]);
+  const [userInput,setUserInput]=useState("");
+  const [chatLoading,setChatLoading]=useState(false);
+  const qs=INTERVIEW_QS[cat]||[];
+  const getQ=()=>qs[qIdx%qs.length];
+
+  const getFeedback=async()=>{
+    if(!answer.trim())return;
+    setLoading(true);setFeedback("");
+    const prompt=`You are an experienced interview coach. A candidate is interviewing for a ${contextJob?.title||"software engineering"} role at ${contextJob?.company||"a top tech company"}.
+
+Question: "${getQ()}"
+Their answer: "${answer}"
+
+Give structured feedback with:
+1. STRENGTHS (what they did well)
+2. IMPROVEMENTS (specific things to add/change)
+3. BETTER ANSWER TIPS (1-2 concrete suggestions)
+4. STAR RATING (1-5 with brief justification)
+
+Be constructive, specific, and encouraging.`;
+    await callAI(prompt,setFeedback);
+    setLoading(false);
+  };
+  const sendChat=async()=>{
+    if(!userInput.trim()||chatLoading)return;
+    const msg=userInput;setUserInput("");
+    setChatHistory(h=>[...h,{role:"user",text:msg}]);
+    setChatLoading(true);
+    const context=chatHistory.slice(-4).map(m=>`${m.role==="ai"?"AI":"You"}: ${m.text}`).join("\n");
+    const prompt=`You are an interview preparation AI coach. Context:\n${context}\n\nUser: ${msg}\n\nRespond as a helpful, encouraging interview coach. Keep responses focused and practical. Max 3 sentences.`;
+    let resp="";
+    await callAI(prompt,t=>{resp=t;});
+    setChatHistory(h=>[...h,{role:"ai",text:resp}]);
+    setChatLoading(false);
+  };
+  const formatFeedback=(text)=>text.split("\n").map((line,i)=>{
+    if(/^\d\./.test(line))return <div key={i} style={{fontFamily:"Clash Display",fontWeight:600,marginTop:i>0?14:0,marginBottom:4,fontSize:14}}>{line}</div>;
+    if(line.startsWith("- "))return <div key={i} className="flex gap-8 mb-4"><span style={{color:"var(--a1)"}}>·</span><span style={{color:"var(--t2)",fontSize:13,lineHeight:1.6}}>{line.slice(2)}</span></div>;
+    if(line.trim()==="")return <div key={i} style={{height:4}}/>;
+    return <div key={i} style={{color:"var(--t2)",fontSize:13,lineHeight:1.7}}>{line}</div>;
+  });
+  return(
+    <div>
+      <div className="flex gap-12 mb-4">
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700}}>Interview Practice</h2>
+        <AIBadge/>
+      </div>
+      {contextJob&&<div className="text-muted mb-16 text-sm">Preparing for: {contextJob.title} at {contextJob.company}</div>}
+      <div className="grid-2" style={{gap:16}}>
+        {/* Practice Panel */}
+        <div>
+          <div className="card" style={{padding:20,marginBottom:12}}>
+            <div className="tabs" style={{marginBottom:16}}>
+              {Object.keys(INTERVIEW_QS).map(c=>(
+                <button key={c} className={`tab ${cat===c?"active":""}`} onClick={()=>{setCat(c);setQIdx(0);setAnswer("");setFeedback("");}}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <div style={{background:"var(--bg4)",borderRadius:10,padding:16,marginBottom:14}}>
+              <div className="text-xs text-muted mb-8">Question {(qIdx%qs.length)+1} of {qs.length}</div>
+              <div style={{fontSize:15,fontWeight:500,lineHeight:1.6}}>{getQ()}</div>
+            </div>
+            <textarea value={answer} onChange={e=>setAnswer(e.target.value)} className="inp" placeholder="Type your answer here… Use the STAR method: Situation, Task, Action, Result" style={{height:140,resize:"none",marginBottom:12,lineHeight:1.7}}/>
+            <div className="flex gap-8">
+              <button onClick={getFeedback} disabled={loading||!answer.trim()} className="btn btn-primary" style={{flex:1,justifyContent:"center",opacity:(!answer.trim()||loading)?.6:1}}>
+                {loading?<><Spinner size={14}/> Analysing…</>:"✦ Get AI Feedback"}
+              </button>
+              <button className="btn btn-ghost btn-sm" onClick={()=>{setQIdx(i=>i+1);setAnswer("");setFeedback("");}}>Next Q →</button>
+            </div>
+          </div>
+          {feedback&&(
+            <div className="card" style={{padding:20}}>
+              <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:12,display:"flex",alignItems:"center",gap:8}}><AIBadge/> Feedback</div>
+              {formatFeedback(feedback)}
+            </div>
+          )}
+        </div>
+
+        {/* AI Chat Coach */}
+        <div className="card" style={{padding:0,display:"flex",flexDirection:"column",height:520}}>
+          <div style={{padding:"16px 20px",borderBottom:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"Clash Display",fontWeight:600}}>AI Interview Coach</div>
+            <div className="text-xs text-muted">Ask anything about interviewing</div>
+          </div>
+          <div style={{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:10}}>
+            {chatHistory.map((m,i)=>(
+              <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
+                {m.role==="ai"&&<div className="avatar" style={{width:26,height:26,fontSize:11,marginRight:8,alignSelf:"flex-end",flexShrink:0}}>AI</div>}
+                <div className={`chat-bubble ${m.role==="ai"?"ai":"user"}`}>{m.text}</div>
+              </div>
+            ))}
+            {chatLoading&&<div className="flex gap-8"><div className="avatar" style={{width:26,height:26,fontSize:11}}>AI</div><div className="chat-bubble ai pulsing">…</div></div>}
+          </div>
+          <div style={{padding:12,borderTop:"1px solid var(--border)",display:"flex",gap:8}}>
+            <input value={userInput} onChange={e=>setUserInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&sendChat()} className="inp" placeholder="Ask your coach…" style={{flex:1}}/>
+            <button onClick={sendChat} disabled={chatLoading} className="btn btn-primary btn-sm">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── SALARY TOOL ────────────────────────────────────────────── */
+const SalaryTool=({profile})=>{
+  const [role,setRole]=useState("Frontend Engineer");
+  const [location,setLocation]=useState("London");
+  const [exp,setExp]=useState("1-2");
+  const [loading,setLoading]=useState(false);
+  const [data,setData]=useState(null);
+  const fetchSalary=async()=>{
+    setLoading(true);setData(null);
+    const prompt=`Provide a detailed salary analysis for a ${role} with ${exp} years experience in ${location}, UK.
+
+Respond ONLY with valid JSON in exactly this format:
+{"median":75000,"range_low":58000,"range_high":95000,"remote_premium":8000,"london_premium":12000,"skills":[{"name":"React","premium":5000},{"name":"TypeScript","premium":4000},{"name":"GraphQL","premium":6000},{"name":"AWS","premium":7000},{"name":"Team Lead","premium":12000}],"companies":[{"name":"Big Tech (FAANG)","range":"£95k–£180k"},{"name":"Scale-up","range":"£75k–£120k"},{"name":"Startup","range":"£55k–£85k"},{"name":"Agency","range":"£45k–£65k"},{"name":"Public Sector","range":"£40k–£60k"}],"trend":"Growing","yoy_growth":8,"insight":"Senior frontend engineers with TypeScript and cloud experience are in high demand across London."}`
+    ;
+    const text=await callAI(prompt);
+    try{const j=JSON.parse(text.replace(/```json|```/g,"").trim());setData(j);}
+    catch{setData({median:72000,range_low:55000,range_high:95000,remote_premium:7000,london_premium:10000,skills:[{name:"React",premium:5000},{name:"TypeScript",premium:4000},{name:"Node.js",premium:3000}],companies:[{name:"Big Tech",range:"£90k–£160k"},{name:"Scale-up",range:"£70k–£110k"},{name:"Startup",range:"£55k–£80k"}],trend:"Growing",yoy_growth:7,insight:"Strong market for frontend engineers in London."});}
+    setLoading(false);
+  };
+  const fmt=n=>n>=1000?`£${(n/1000).toFixed(0)}k`:`£${n}`;
+  return(
+    <div>
+      <div className="flex gap-12 mb-4">
+        <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700}}>Salary Intelligence</h2>
+        <AIBadge/>
+      </div>
+      <p className="text-muted mb-20">AI-powered salary benchmarking for your target role.</p>
+
+      <div className="card" style={{padding:20,marginBottom:16}}>
+        <div className="grid-3 mb-12">
+          <div className="inp-group">
+            <label className="inp-label">Job Title</label>
+            <input value={role} onChange={e=>setRole(e.target.value)} className="inp"/>
+          </div>
+          <div className="inp-group">
+            <label className="inp-label">Location</label>
+            <select value={location} onChange={e=>setLocation(e.target.value)} className="inp">
+              {["London","Manchester","Edinburgh","Birmingham","Bristol","Remote"].map(l=><option key={l}>{l}</option>)}
+            </select>
+          </div>
+          <div className="inp-group">
+            <label className="inp-label">Experience</label>
+            <select value={exp} onChange={e=>setExp(e.target.value)} className="inp">
+              {["0-1","1-2","2-4","4-7","7+"].map(e=><option key={e} value={e}>{e} years</option>)}
+            </select>
+          </div>
+        </div>
+        <button onClick={fetchSalary} disabled={loading} className="btn btn-primary" style={{width:"100%",justifyContent:"center",opacity:loading?.7:1}}>
+          {loading?<><Spinner size={15}/> Fetching salary data…</>:"◐ Get Salary Data"}
+        </button>
+      </div>
+
+      {data&&(
+        <div className="fade-up">
+          {/* Main number */}
+          <div style={{background:"linear-gradient(135deg,#3d7fff15,#6b4fff15)",border:"1px solid #3d7fff25",borderRadius:14,padding:24,marginBottom:14,textAlign:"center"}}>
+            <div className="text-muted text-sm mb-4">Median Salary · {role} · {location}</div>
+            <div style={{fontFamily:"Clash Display",fontSize:42,fontWeight:700,background:"linear-gradient(120deg,var(--a1),var(--a3))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+              {fmt(data.median)} / yr
+            </div>
+            <div className="text-muted mt-8">Range: {fmt(data.range_low)} – {fmt(data.range_high)}</div>
+            <div className="flex gap-16 mt-12" style={{justifyContent:"center"}}>
+              <span style={{color:"var(--green)",fontSize:13}}>↑ {data.yoy_growth}% YoY</span>
+              <span style={{color:"var(--a5)",fontSize:13}}>📍 Remote: +{fmt(data.remote_premium)}</span>
+            </div>
+          </div>
+
+          <div className="grid-2 mb-14">
+            {/* Skill premiums */}
+            <div className="card" style={{padding:16}}>
+              <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:12}}>Skill Premiums</div>
+              {data.skills.map(s=>(
+                <div key={s.name} className="skill-row">
+                  <span className="skill-name">{s.name}</span>
+                  <div className="skill-bar">
+                    <div className="skill-fill" style={{width:`${Math.min(100,(s.premium/15000)*100)}%`,background:"var(--a3)"}}/>
+                  </div>
+                  <span style={{color:"var(--a3)",fontSize:12,minWidth:45,textAlign:"right"}}>+{fmt(s.premium)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* By company type */}
+            <div className="card" style={{padding:16}}>
+              <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:12}}>By Company Type</div>
+              {data.companies.map((c,i)=>(
+                <div key={i} className="flex gap-10 mb-10">
+                  <div style={{flex:1}}>
+                    <div className="text-sm font-medium">{c.name}</div>
+                    <div className="text-xs text-muted">{c.range}</div>
+                  </div>
+                  <ProgressBar pct={90-i*15} color="var(--a1)"/>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Market insight */}
+          <div style={{background:"var(--bg4)",border:"1px solid var(--border)",borderRadius:10,padding:16}}>
+            <div className="flex gap-8 mb-8">
+              <span style={{color:"var(--a1)"}}>◉</span>
+              <span style={{fontFamily:"Clash Display",fontWeight:600,fontSize:14}}>Market Insight</span>
+            </div>
+            <p style={{color:"var(--t2)",lineHeight:1.7,fontSize:13}}>{data.insight}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Skills market */}
+      <div className="card" style={{padding:20,marginTop:14}}>
+        <div className="section-title">Tech Skills Market Overview 2025</div>
+        {Object.entries(SKILLS_MARKET).map(([skill,d])=>(
+          <div key={skill} className="flex gap-12 mb-10" style={{alignItems:"center"}}>
+            <span style={{width:90,fontSize:13,flexShrink:0}}>{skill}</span>
+            <div style={{flex:1}}>
+              <div className="flex gap-8 mb-4">
+                <span className="text-xs text-muted">Demand</span>
+                <span className="text-xs" style={{marginLeft:"auto",color:"var(--a3)"}}>{d.growth}</span>
+              </div>
+              <ProgressBar pct={d.demand} color="var(--a1)"/>
+            </div>
+            <span style={{color:"var(--a3)",fontSize:13,minWidth:55,textAlign:"right"}}>~£{d.avg}k</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ─── PROFILE ────────────────────────────────────────────────── */
+const Profile=({profile,setProfile})=>{
+  const [tab,setTab]=useState("personal");
+  const [editing,setEditing]=useState(false);
+  const [form,setForm]=useState(profile);
+  const [newSkill,setNewSkill]=useState("");
+  const save=()=>{setProfile(form);setEditing(false);};
+  const strength=Math.round([form.name,form.email,form.location,form.degree,form.bio,form.phone,form.linkedin,form.github,form.skills.length>3,form.experience].filter(Boolean).length*10);
+  const addSkill=()=>{if(newSkill.trim()&&!form.skills.includes(newSkill.trim())){setForm(p=>({...p,skills:[...p.skills,newSkill.trim()]}));setNewSkill("");}};
+  return(
+    <div>
+      <h2 style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700,marginBottom:20}}>My Profile</h2>
+
+      {/* Profile header */}
+      <div className="card" style={{padding:24,marginBottom:16}}>
+        <div className="flex gap-16 mb-16">
+          <div className="avatar xl">{profile.name[0]}</div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:"Clash Display",fontSize:22,fontWeight:700}}>{profile.name}</div>
+            <div className="text-muted">{profile.degree} · {profile.university}</div>
+            <div className="text-sm text-muted mt-4">{profile.location}</div>
+            <div className="flex gap-8 mt-10">
+              {profile.jobTypes.map(t=><span key={t} className="pill">{t}</span>)}
+              {profile.industries.map(i=><span key={i} className="badge badge-blue">{i}</span>)}
+            </div>
+          </div>
+          <button className={`btn ${editing?"btn-primary":"btn-ghost"} btn-sm`} onClick={()=>editing?save():setEditing(true)}>
+            {editing?"Save Changes":"Edit Profile"}
+          </button>
+        </div>
+
+        {/* Profile strength */}
+        <div>
+          <div className="flex gap-8 mb-8">
+            <span className="text-sm font-medium">Profile Strength</span>
+            <span style={{color:"var(--a3)",fontWeight:600,fontSize:13}}>{strength}%</span>
+          </div>
+          <div className="flex gap-3">
+            {Array.from({length:10}).map((_,i)=>(
+              <div key={i} className="strength-segment" style={{background:i<Math.floor(strength/10)?`hsl(${140-i*10},70%,50%)`:"var(--bg5)"}}/>
+            ))}
+          </div>
+          {strength<100&&<div className="text-xs text-hint mt-6">Complete your profile to get better job matches</div>}
+        </div>
+      </div>
+
+      <div className="tabs mb-0">
+        {["personal","skills","preferences","links"].map(t=>(
+          <button key={t} className={`tab ${tab===t?"active":""}`} onClick={()=>setTab(t)} style={{textTransform:"capitalize"}}>{t}</button>
+        ))}
+      </div>
+
+      <div className="card" style={{padding:20,borderTopLeftRadius:0,borderTopRightRadius:0,borderTop:"none"}}>
+        {tab==="personal"&&(
+          <div>
+            {editing?(
+              <div>
+                <div className="grid-2 mb-12">
+                  {[["Name","name"],["Email","email"],["Phone","phone"],["Location","location"],["Degree","degree"],["University","university"],["Graduation Year","gradYear"],["Experience","experience"],["Salary Expectation","salary"]].map(([l,k])=>(
+                    <div key={k} className="inp-group">
+                      <label className="inp-label">{l}</label>
+                      <input value={form[k]||""} onChange={e=>setForm(p=>({...p,[k]:e.target.value}))} className="inp"/>
+                    </div>
+                  ))}
+                </div>
+                <div className="inp-group">
+                  <label className="inp-label">Professional Bio</label>
+                  <textarea value={form.bio||""} onChange={e=>setForm(p=>({...p,bio:e.target.value}))} className="inp" style={{height:90,resize:"none"}}/>
+                </div>
+              </div>
+            ):(
+              <div className="grid-2">
+                {[["Email",profile.email],["Phone",profile.phone],["Location",profile.location],["Degree",profile.degree],["University",profile.university],["Graduation",profile.gradYear],["Experience",profile.experience],["Salary",profile.salary]].map(([l,v])=>(
+                  <div key={l}>
+                    <div className="inp-label mb-4">{l}</div>
+                    <div className="text-sm">{v||<span className="text-hint">Not set</span>}</div>
+                  </div>
+                ))}
+                <div style={{gridColumn:"1/-1"}}>
+                  <div className="inp-label mb-4">Bio</div>
+                  <div className="text-sm text-muted" style={{lineHeight:1.7}}>{profile.bio}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab==="skills"&&(
+          <div>
+            <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:12}}>Skills ({(editing?form:profile).skills.length})</div>
+            <div className="flex gap-8 mb-16" style={{flexWrap:"wrap"}}>
+              {(editing?form:profile).skills.map(s=>(
+                <span key={s} className="badge badge-blue" style={{alignItems:"center",gap:6}}>
+                  {s}
+                  {editing&&<span onClick={()=>setForm(p=>({...p,skills:p.skills.filter(x=>x!==s)}))} style={{cursor:"pointer",opacity:.6,fontSize:10}}>✕</span>}
+                </span>
+              ))}
+            </div>
+            {editing&&(
+              <div className="flex gap-8">
+                <input value={newSkill} onChange={e=>setNewSkill(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addSkill()} className="inp" placeholder="Add skill…" style={{flex:1}}/>
+                <button onClick={addSkill} className="btn btn-primary btn-sm">Add</button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab==="preferences"&&(
+          <div>
+            <div className="mb-16">
+              <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:10}}>Job Types</div>
+              <div className="flex gap-8" style={{flexWrap:"wrap"}}>
+                {["Remote","Hybrid","On-site"].map(t=>{
+                  const active=(editing?form:profile).jobTypes.includes(t);
+                  return <button key={t} onClick={()=>editing&&setForm(p=>({...p,jobTypes:active?p.jobTypes.filter(x=>x!==t):[...p.jobTypes,t]}))} className="btn btn-sm" style={{background:active?"var(--a1)":"var(--bg5)",color:active?"white":"var(--t2)",border:active?"1px solid var(--a1)":"1px solid var(--border)",cursor:editing?"pointer":"default"}}>{t}</button>;
+                })}
+              </div>
+            </div>
+            <div>
+              <div style={{fontFamily:"Clash Display",fontWeight:600,marginBottom:10}}>Industries</div>
+              <div className="flex gap-8" style={{flexWrap:"wrap"}}>
+                {["Technology","FinTech","SaaS","E-commerce","Gaming","Healthcare","AI/ML","Consulting"].map(ind=>{
+                  const active=(editing?form:profile).industries.includes(ind);
+                  return <button key={ind} onClick={()=>editing&&setForm(p=>({...p,industries:active?p.industries.filter(x=>x!==ind):[...p.industries,ind]}))} className="btn btn-sm" style={{background:active?"var(--a2)":"var(--bg5)",color:active?"white":"var(--t2)",border:active?"1px solid var(--a2)":"1px solid var(--border)",cursor:editing?"pointer":"default"}}>{ind}</button>;
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==="links"&&(
+          <div className="grid-2">
+            {editing?(
+              [["LinkedIn","linkedin","🔗"],["GitHub","github","🐙"],["Portfolio","portfolio","🌐"]].map(([l,k,icon])=>(
+                <div key={k} className="inp-group">
+                  <label className="inp-label">{icon} {l}</label>
+                  <input value={form[k]||""} onChange={e=>setForm(p=>({...p,[k]:e.target.value}))} className="inp" placeholder={`your-${l.toLowerCase()}.com`}/>
+                </div>
+              ))
+            ):(
+              [["LinkedIn",profile.linkedin,"🔗"],["GitHub",profile.github,"🐙"],["Portfolio",profile.portfolio,"🌐"]].map(([l,v,icon])=>(
+                <div key={l}>
+                  <div className="inp-label mb-4">{icon} {l}</div>
+                  <div className="text-sm" style={{color:v?"var(--a1)":"var(--t3)"}}>{v||"Not set"}</div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ─── TOPBAR ─────────────────────────────────────────────────── */
+const Topbar=({page,apps,profile})=>{
+  const titles={dashboard:"Dashboard",search:"Job Search",saved:"Saved Jobs",tracker:"Application Tracker",cv:"CV Builder",cover:"Cover Letter",insights:"Company Insights",practice:"Interview Practice",salary:"Salary Tool",profile:"My Profile"};
+  const upcoming=apps.filter(a=>a.interview&&new Date(a.interview)>=new Date());
+  return(
+    <div className="topbar">
+      <div style={{fontFamily:"Clash Display",fontSize:16,fontWeight:600,flex:1}}>{titles[page]||"Jobly"}</div>
+      {upcoming.length>0&&(
+        <div className="flex gap-6 badge badge-amber" style={{fontSize:12}}>
+          📅 {upcoming.length} interview{upcoming.length>1?"s":""} upcoming
+        </div>
+      )}
+      <div className="flex gap-10">
+        <div className="avatar" style={{width:30,height:30,fontSize:12}}>{profile.name[0]}</div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── MAIN APP ───────────────────────────────────────────────── */
+function App(){
+  const [page,setPage]=useLocalStorage("jb_page","dashboard");
+  const [jobs,setJobs]=useLocalStorage("jb_jobs",JOBS);
+  const [apps,setApps]=useLocalStorage("jb_apps",INIT_APPS);
+  const [profile,setProfile]=useLocalStorage("jb_profile",INIT_PROFILE);
+  const [contextJob,setContextJob]=useState(null);
+  const [detailJob,setDetailJob]=useState(null);
+  const [collapsed,setCollapsed]=useState(false);
+
+  const handleSelect=(job)=>setDetailJob(job);
+
+  const renderPage=()=>{
+    const p={jobs,setJobs,apps,setApps,profile,setProfile,setPage,setContextJob,contextJob,onSelect:handleSelect};
+    switch(page){
+      case "dashboard":return <Dashboard {...p}/>;
+      case "search":return <JobSearch {...p}/>;
+      case "saved":return <SavedJobs {...p}/>;
+      case "tracker":return <AppTracker {...p}/>;
+      case "cv":return <CVBuilder contextJob={contextJob} profile={profile}/>;
+      case "cover":return <CoverLetter contextJob={contextJob} profile={profile}/>;
+      case "insights":return <CompanyInsights contextJob={contextJob} jobs={jobs} setContextJob={setContextJob}/>;
+      case "practice":return <InterviewPractice contextJob={contextJob}/>;
+      case "salary":return <SalaryTool profile={profile}/>;
+      case "profile":return <Profile profile={profile} setProfile={setProfile}/>;
+      default:return null;
+    }
+  };
+
+  return(
+    <div className="app">
+      <Sidebar page={page} setPage={setPage} apps={apps} collapsed={collapsed} setCollapsed={setCollapsed}/>
+      <div className="main">
+        <Topbar page={page} apps={apps} profile={profile}/>
+        <div className="content fade-in" key={page}>
+          {renderPage()}
+        </div>
+      </div>
+      {detailJob&&(
+        <JobDetailModal job={detailJob} onClose={()=>setDetailJob(null)} setPage={setPage} setContextJob={setContextJob} jobs={jobs} setJobs={setJobs}/>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
